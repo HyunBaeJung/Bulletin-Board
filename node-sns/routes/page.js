@@ -1,3 +1,5 @@
+/*
+
 const express = require('express');
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const {
@@ -24,3 +26,5 @@ router.get('/', renderMain);
 router.get('/hashtag', renderHashtag);
 
 module.exports = router;
+
+*/

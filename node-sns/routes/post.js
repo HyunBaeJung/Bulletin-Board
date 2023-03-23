@@ -1,3 +1,5 @@
+/*
+
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -39,3 +41,5 @@ router.post('/', isLoggedIn, upload2.none(), uploadPost);
 router.delete('/:id', isLoggedIn, deletePost);
 
 module.exports = router;
+
+*/

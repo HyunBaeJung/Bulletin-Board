@@ -7,17 +7,18 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 
 dotenv.config();
-const pageRouter = require('./routes/page');
+// const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
-const postRouter = require('./routes/post');
+// const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
-const { sequelize } = require('./models');
-const passportConfig = require('./passport');
+// const { sequelize } = require('./models');
+// const passportConfig = require('./passport');
 
 const app = express();
-passportConfig();
+// passportConfig();
 app.set('port', process.env.PORT || 8002);
 
+/*
 sequelize.sync({ force: false })
   .then(() => {
     console.log('데이터베이스 연결 성공');
@@ -25,6 +26,7 @@ sequelize.sync({ force: false })
   .catch((err) => {
     console.log(err);
   });
+*/
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'react-project/build')));
@@ -42,12 +44,12 @@ app.use(session({
   },
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-app.use('/', pageRouter);
+// app.use('/', pageRouter);
 app.use('/auth', authRouter);
-app.use('/post', postRouter);
+// app.use('/post', postRouter);
 app.use('/user', userRouter);
 
 app.use((req, res, next) => {

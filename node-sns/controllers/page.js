@@ -1,3 +1,5 @@
+/*
+
 const { User, Post, Hashtag } = require('../models');
 
 exports.renderProfile = (req, res) => {
@@ -44,15 +46,16 @@ exports.renderHashtag = async (req, res, next) => {
       posts = await hashtag.getPosts({ include: [{ model: User }] });
     }
 
-    /*
     return res.render('main', {
       title: `${query} | Node SNS`,
       twits: posts,
     });
-    */
+    
     res.send('renderHashtag');
   } catch (error) {
     console.error(error);
     return next(error); // 마지막 부분이라 return으로 종료?
   }
 }
+
+*/

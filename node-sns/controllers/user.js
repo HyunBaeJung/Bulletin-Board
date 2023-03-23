@@ -1,4 +1,4 @@
-const User = require('../models/user');
+// const User = require('../models/user');
 
 /*
 exports.userRouter = async (req, res, next) => {
@@ -35,6 +35,7 @@ exports.postUser = (req, res, next) => {
 /////////////////////// test ////////////////////////
 
 
+/*
 
 exports.follow = async (req, res, next) => {
   try {
@@ -50,3 +51,5 @@ exports.follow = async (req, res, next) => {
     next(error);
   }
 };
+
+*/

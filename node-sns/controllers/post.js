@@ -1,3 +1,5 @@
+/*
+
 const { Post, Hashtag } = require('../models');
 
 exports.afterUploadImage = (req, res) => {
@@ -12,7 +14,13 @@ exports.uploadPost = async (req, res, next) => {
       img: req.body.url,
       UserId: req.user.id,
     });
-    const hashtags = req.body.content.match(/#[^\s#]*/g);
+
+    */
+
+    // const hashtags = req.body.content.match(/#[^\s#]*/g);
+    
+    /*
+    
     if (hashtags) {
       const result = await Promise.all(
         hashtags.map(tag => {
@@ -53,3 +61,5 @@ exports.deletePost = async (req, res, next) => {
 
 // 게시글 수정 기능 추가
 // exports.patchPost = ~~~
+
+*/

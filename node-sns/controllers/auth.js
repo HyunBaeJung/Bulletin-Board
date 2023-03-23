@@ -1,6 +1,6 @@
-const bcrypt = require('bcrypt');
-const passport = require('passport');
-const User = require('../models/user');
+// const bcrypt = require('bcrypt');
+// const passport = require('passport');
+// const User = require('../models/user');
 
 
 
@@ -27,6 +27,7 @@ exports.postLogin = (req, res, next) => {
 //////////////////////////////////////////// test ///////////////////////////////////////////
 
 
+/*
 
 exports.join = async (req, res, next) => {
   const { email, nick, password } = req.body;
@@ -77,3 +78,5 @@ exports.logout = (req, res) => {
     // res.redirect('/');
   });
 }
+
+*/
