@@ -7,18 +7,8 @@ function RequestExample() {
 
   async function getUser() { // async, await을 사용하는 경우
     try {
-      
       // GET 요청은 params에 실어 보냄
-      const response = await axios.get('/user', {
-          params: {
-              ID: 12345
-          }
-      });
-      
-      // 응답 결과(response)를 변수에 저장하거나.. 등 필요한 처리를 해 주면 된다.
-      var userId = 12345;
-      await axios.get(`/user?ID=${userId}`); // Backtick(`)을 이용해 이렇게 요청할 수도 있다.
-      
+      const response = await axios.get('/user', { params: { ID: 12345 }});
       console.log(response);
     } catch (e) {
       // 실패 시 처리
@@ -44,29 +34,29 @@ function RequestExample() {
 2. 클릭시 URL로 <form>태그 안에 입력된 값들이 'action' 속성으로 지정된 서버 페이지로 전송됩니다.
 */
     <div className="container">
-        <h2>post test </h2>
-        <form id="login-form1" action="/auth/login" method="post">
-          <div class="input-group">
-            <label for="email">이메일</label>
-            <input id="email-id" type="email-tp" name="email-nm" required autofocus/>
-          </div>
-          <div class="input-group">
-            <label for="password">비밀번호</label>
-            <input id="password-id" type="password-tp" name="password-nm" required/>
-          </div>
-          <button id="login" type="submit" class="btn">POST</button>
-        </form>
         <h2>get test</h2>
         <form id="login-form2" action="/auth/login" method="get">
           <div class="input-group">
             <label for="email">이메일</label>
-            <input id="email-id" type="email-tp" name="email-nm" required autofocus/>
+            <input id="email-id" type="email-tp" name="emailName" required autofocus/>
           </div>
           <div class="input-group">
             <label for="password">비밀번호</label>
-            <input id="password-id" type="password-tp" name="password-nm" required/>
+            <input id="password-id" type="password-tp" name="passwordName" required/>
           </div>
           <button id="login" type="submit" class="btn">GET</button>
+        </form>
+        <h2>post test </h2>
+        <form id="login-form1" action="/auth/login" method="post">
+          <div class="input-group">
+            <label for="email">이메일</label>
+            <input id="email-id" type="email-tp" name="emailName" required autofocus/>
+          </div>
+          <div class="input-group">
+            <label for="password">비밀번호</label>
+            <input id="password-id" type="password-tp" name="passwordName" required/>
+          </div>
+          <button id="login" type="submit" class="btn">POST</button>
         </form>
         
         <div>

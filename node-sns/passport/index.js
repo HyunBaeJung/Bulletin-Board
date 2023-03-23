@@ -9,8 +9,6 @@ module.exports = () => {
     done(null, user.id);
   });
 
-  // 각 요청마다 실행, 매개변수 id는 serializeUser의 user.id
-  // 팔로워와 팔로잉 목록도 함께 저장
   passport.deserializeUser((id, done) => {
     User.findOne({
       where: { id },

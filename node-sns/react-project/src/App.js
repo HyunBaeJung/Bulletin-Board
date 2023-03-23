@@ -22,7 +22,9 @@ function App() {
             <img src={googleImg}/>
             <img src={naverImg}/>
           </div>
-          <button >회원가입</button> <button >로그인</button>
+          <input type='submit' action='/join'>
+            <button >회원가입</button> <button >로그인</button>
+          </input>
       </form>
       </div>
     </div>

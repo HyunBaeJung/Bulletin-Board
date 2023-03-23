@@ -21,7 +21,6 @@ exports.uploadPost = async (req, res, next) => {
           })
         }),
       );
-      // addHashtags는 관계 설정 시 생성된 메서드
       await post.addHashtags(result.map(r => r[0]));
     }
     res.redirect('/');

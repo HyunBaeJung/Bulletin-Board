@@ -17,11 +17,9 @@ try {
 
 const upload = multer({
   storage: multer.diskStorage({
-    // 어디에
     destination(req, file, cb) {
       cb(null, 'uploads/');
     },
-    // 어떤 이름으로
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
       cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
