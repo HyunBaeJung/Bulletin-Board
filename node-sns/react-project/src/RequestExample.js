@@ -18,11 +18,13 @@ function RequestExample() {
   // POST
   async function postUser() {
     try {
+      console.log('start!');
       // POST 요청은 body에 실어 보냄
       await axios.post('/user', {
           firstName: 'Fred',
           lastName: 'Flintstone'
       });
+      console.log('end!');
     } catch (e) {
       console.error(e);
     }

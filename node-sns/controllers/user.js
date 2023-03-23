@@ -11,22 +11,20 @@ exports.userRouter = async (req, res, next) => {
 
 /////////////////////// test ////////////////////////
 
-exports.getUser = async (req, res, next) => {
+exports.getUser = (req, res, next) => {
   try {
-    console.log('okokokokokokok!!!!!!!!!!!!!!!!!!!!!');
-    console.log(req.query);
-    console.log(req.body);
-    
+    console.log(req.query.ID);
     res.send(`${req.query.ID}`);
-    // return res.send(`${req.body.params.ID}`);
   } catch (error) {
     console.error('test error');
     next(error);
   } 
 }
 
-exports.postUser = async (req, res, next) => {
+exports.postUser = (req, res, next) => {
   try {
+    console.log(req.body.firstName);
+    console.log(req.body.lastName);
     return res.send(`${req.body.firstName} ${req.body.lastName}`);
   } catch (error) {
     console.error('test error');

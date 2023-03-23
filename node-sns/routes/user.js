@@ -1,7 +1,8 @@
 const express = require('express');
 
-const { isLoggedIn } = require('../middlewares');
-const { userRouter, follow, getUser, postUser } = require('../controllers/user');
+// const { isLoggedIn } = require('../middlewares');
+// const { userRouter, follow } = require('../controllers/user');
+const { getUser, postUser } = require('../controllers/user');
 
 const router = express.Router();
 
@@ -10,19 +11,19 @@ const router = express.Router();
 /////////////// test ////////////////
 
 // GET /auth/login
-router.get('/user', getUser);
+router.get('/', getUser);
 
 // POST /auth/login
-router.post('/user', postUser);
+router.post('/', postUser);
 
 /////////////// test ////////////////
 
 
+/*
 
 // POST /user/:id/follow
 router.post('/:id/follow', isLoggedIn, follow);
 
-// router.post('/user', userRouter);
-// router.get('/user', userRouter);
+*/
 
 module.exports = router;

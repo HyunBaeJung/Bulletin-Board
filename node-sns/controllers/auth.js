@@ -6,7 +6,7 @@ const User = require('../models/user');
 
 //////////////////////////////////////////// test ///////////////////////////////////////////
 
-exports.getLogin = async (req, res, next) => {
+exports.getLogin = (req, res, next) => {
   try {
     res.send(`이메일이 ${req.query.emailName}, 비밀번호가 ${req.query.passwordName} 맞나요???`);
   } catch (error) {
@@ -15,7 +15,7 @@ exports.getLogin = async (req, res, next) => {
   }
 }
 // test post
-exports.postLogin = async (req, res, next) => {
+exports.postLogin = (req, res, next) => {
   try {
     return res.send(`이메일이 ${req.body.emailName}, 비밀번호가 ${req.body.passwordName} 맞나요???`);
   } catch (error) {
