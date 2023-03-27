@@ -7,7 +7,6 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 
 dotenv.config();
-const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
 const passportConfig = require('./passport');
@@ -41,7 +40,6 @@ app.use(session({
 app.use(passport.initialize);
 app.use(passport.session);
 
-app.use('/page', pageRouter);
 app.use('/auth', authRouter);
 
 app.use((req, res, next) => {
@@ -51,10 +49,10 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-	res.locals.message = err.message;
-	res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
+	const message = err.message;
+	const stack = process.env.NODE_ENV !== 'production' ? err.stack : {};
 	res.status(err.status || 500);
-	res.render('error');
+	res.json({ message, stack });
 });
 
 app.listen(app.get('port'), () => {

@@ -5,38 +5,42 @@ class User extends Sequelize.Model {
     User.init({
       email: {
         type: Sequelize.STRING(40),
-        allowNull: true,
+        allowNull: false,
         unique: true,
       },
       password: {
         type: Sequelize.STRING(100),
-        allowNull: true,
+        allowNull: false,
       },
-      name: {
-        type: Sequelize.STRING(),
-        allowNull: true,
+      username: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
       },
       birthday: {
-        type: Sequelize.DATEONLY(),
-        allowNull: true,
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       gender: {
-        type: Sequelize.ENUM('m', 'w'),
-        allowNull: true,
+        type: Sequelize.ENUM('M', 'W'),
+        allowNull: false,
       },
       address: {
-        type: Sequelize.STRING(),
-        allowNull: true,
+        type: Sequelize.STRING(200),
+        allowNull: false,
       },
-      phonenumber: {
-        type: Sequelize.STRING(),
-        allowNull: true,
+      mobile_number: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
       },
       provider: {
         type: Sequelize.ENUM('local', 'kakao', 'naver', 'google'),
         allowNull: false,
         defaultValue: 'local',
       },
+      snsId: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+      }
     }, {
       sequelize,
       timestamps: true,

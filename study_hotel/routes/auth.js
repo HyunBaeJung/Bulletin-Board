@@ -2,7 +2,7 @@ const express = require('express');
 const passport = reqruire('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
-const { login, logout } = require('../controllers/auth');
+const { join, login, logout } = require('../controllers/auth');
 
 const router = express.Router();
 
@@ -20,7 +20,10 @@ router.get('/kakao', passport.authenticate('kakao'));
 
 // GET /auth/kakao/callback
 router.get('/kakao/callback', passport.authenticate('kakao', {
-  failureRedirect: '/?loginError=카카오로그인 실패',
+  // 로그인 실패 시 이동할 경로(리액트 앱에 요청)
+  failureRedirect: '/page/login/fail?loginError=카카오로그인 실패',
 }), (req, res) => {
-  res.redirect('/');
+  res.send('카카오 로그인 성공');
 });
+
+// GET /auth/google
