@@ -9,8 +9,8 @@ import pwImg from "./img/SignUp/pencil.png";
 import pwCheckImg from "./img/SignUp/check.png";
 import InputButtonCombo from "./components/combination/InputButtonCombo";
 import InputBox from "./components/basic/InputBox";
-import Button from "./components/basic/ButtonBox";
 import ButtonBox from "./components/basic/ButtonBox";
+import Footer from "./components/Footer";
 
 
 export default function SignUp() {
@@ -26,7 +26,7 @@ export default function SignUp() {
           title="아이디"
           type="text"
           id="id"
-          backPH="@study-hotel.com"
+          backPH="@studyH.com"
         />
         <ImgInput title="비밀번호" type="password" id="password" src={pwImg} />
         <ImgInput
@@ -48,15 +48,13 @@ export default function SignUp() {
           width="w-52"
         />
          <InputButtonCombo title="휴대전화" 
-         inputBox={ <InputBox type="number" id="phoneNumber" width="w-18" /> } 
-         buttonBox={<ButtonBox/>} />
-
-        <div>주소</div>
-        <div>휴대전화</div>
-        <div>가입하기</div>
-        <div>가입하기</div>
-        <div>가입하기</div>
+         inputBox={ <InputBox type="number" id="phoneNumber" width="w-full" /> } 
+         buttonBox={<ButtonBox title="인증번호" width="w-20" bgColor="bg-lime-600"/>} />
+        <InputBox type="number" id="phoneNumber" width="w-52" readOnly={true} />
+        <ButtonBox width="w-52 mt-4" title="가입하기" bgColor="bg-lime-600" />
       </form>
+      
+      <Footer/>
     </div>
   );
 }

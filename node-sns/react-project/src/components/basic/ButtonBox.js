@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function ButtonBox() {
+export default function ButtonBox({width, title,bgColor}) {
   return (
-    <div className='flex items-center border text-xs w-18 h-6 p-2 mb-3 bg-white'>
-      <button className='h-3 font-semibold' >인증하기</button>
+    <div className={`flex items-center justify-center border text-xs h-6 ${width} p-2 ml-1 ${bgColor}`}>
+      <button className=' inline-block h-3 font-semibold' >{title}</button>
     </div>
   )
 }
