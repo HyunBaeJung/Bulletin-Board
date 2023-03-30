@@ -29,6 +29,7 @@ exports.join = async (req, res, next) => {
 }
 
 exports.login = (req, res, next) => {
+  // 로그인 전략 수행 => localStrategy.js
   passport.authenticate('local', (authError, user, info) => {
     if (authError) {
       console.error(authError);
@@ -37,6 +38,7 @@ exports.login = (req, res, next) => {
     if (!user) {
       return res.send(`로그인 실패: ${info.message}`);
     }
+    // req.login 메서드가 passport/index.js의 serializeUser를 호출하며 user 전달
     return req.login(user, (loginError) => {
       if (loginError) {
         console.error(loginError);
@@ -48,6 +50,7 @@ exports.login = (req, res, next) => {
 }
 
 exports.logout = (req, res) => {
+  // logout 메서드가 req.user 객체와 req.session 객체를 제거
   req.logout(() => {
     res.send('로그아웃');
   });

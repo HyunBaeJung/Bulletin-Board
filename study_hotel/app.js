@@ -13,7 +13,7 @@ const passportConfig = require('./passport');
 
 const app = express();
 passportConfig();
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8000);
 sequelize.sync({ force: false })
 	.then(() => {
 		console.log('데이터베이스 연결 성공');
@@ -23,17 +23,17 @@ sequelize.sync({ force: false })
 	});
 
 app.use(morgan('dev'));
-app.use(express.static(path.join(__dirname, './react')));
+// app.use(express.static(path.join(__dirname, './react')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session({
-	resave: false,
-	saveUninitialized: false,
-	secret: process.env.COOKIE_SECRET,
+	resave: false,  // 수정 사항 없어도 다시 저장할지 여부
+	saveUninitialized: false,  // 세션에 저장할 내역이 없더라도 세션 생성할지 여부
+	secret: process.env.COOKIE_SECRET,  // 쿠키 서명 비밀 키
 	cookie: {
-		httpOnly: true,
-		secure: false,
+		httpOnly: true,  // 클라이언트에서 쿠키 확인 불가 => JS(리액트)에서 접근 불가
+		secure: false,  // https가 아닌 환경에서도 사용 가능
 	},
 }));
 
