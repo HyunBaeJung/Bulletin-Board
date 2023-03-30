@@ -5,6 +5,7 @@ const path = require('path');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const passport = require('passport');
+const cors = require('cors');
 
 dotenv.config();
 const authRouter = require('./routes/auth');
@@ -22,6 +23,11 @@ sequelize.sync({ force: false })
 		console.log(err);
 	});
 
+app.use(cors());
+app.use(cors({
+	origin: 'http://localhost:3000'
+}));
+
 app.use(morgan('dev'));
 // app.use(express.static(path.join(__dirname, './react')));
 app.use(express.json());
@@ -37,8 +43,8 @@ app.use(session({
 	},
 }));
 
-app.use(passport.initialize);
-app.use(passport.session);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/auth', authRouter);
 
@@ -49,6 +55,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+	console.log(2222);
 	const message = err.message;
 	const stack = process.env.NODE_ENV !== 'production' ? err.stack : {};
 	res.status(err.status || 500);

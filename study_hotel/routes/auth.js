@@ -15,6 +15,8 @@ router.post('/login', isNotLoggedIn, login);
 // GET /auth/logout
 router.get('/logout', isLoggedIn, logout);
 
+/*
+
 // GET /auth/kakao
 router.get('/kakao', passport.authenticate('kakao'));
 
@@ -46,3 +48,7 @@ router.get('/google/callback', passport.authenticate('google', {
 }), (req, res) => {
   res.send('구글 로그인 성공');
 });
+
+*/
+
+module.exports = router;
