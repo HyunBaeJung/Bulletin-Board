@@ -36,7 +36,7 @@ export default function SignIn() {
 
     try {
       // POST 요청은 body에 실어 보냄
-      await axios.post(requests.postJoin, {
+      await axios.post(requests.postLogin, {
         id      : idElement.value,
         password: passWordElement.value,
       });

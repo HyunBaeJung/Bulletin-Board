@@ -2,19 +2,37 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../img/miniLogo-W.png";
+import { useCookies } from "react-cookie";
 
 export default function NavBar() {
+  function Profile() {
+
+    const [cookies] = useCookies(["username"]);
+
+    return (
+      <div>
+        {cookies.username ? (
+          <ButtonWrapper>
+            <p>안녕하세요 {cookies.username}님</p>
+          </ButtonWrapper>
+        ) : (
+          <ButtonWrapper>
+            <Link to={"/SignUp"}>
+              <NavButton>회원가입</NavButton>
+            </Link>
+            <Link to={"/SignIn"}>
+              <NavButton>로그인</NavButton>
+            </Link>
+          </ButtonWrapper>
+        )}
+      </div>
+    );
+  }
+
   return (
     <NavBack>
       <Logo src={logo} />
-      <ButtonWrapper>
-        <Link to={"/SignUp"}>
-          <NavButton>회원가입</NavButton>
-        </Link>
-        <Link to={"/SignIn"}>
-          <NavButton>로그인</NavButton>
-        </Link>
-      </ButtonWrapper>
+      {Profile()}
     </NavBack>
   );
 }
