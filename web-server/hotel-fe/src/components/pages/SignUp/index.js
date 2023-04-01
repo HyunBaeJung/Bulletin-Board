@@ -15,7 +15,8 @@ import Footer from "../../Footer";
 
 export default function SignUp() {
 
-  const [id, setid] = useState("");
+  const [userId, setuserId] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   
 
   return (

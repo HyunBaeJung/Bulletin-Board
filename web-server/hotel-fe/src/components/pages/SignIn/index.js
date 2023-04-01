@@ -13,12 +13,12 @@ import naverImg from "../../../img/naver.png";
 
 export default function SignIn() {
 
-  /*
+  
   const fetchData = async () => {
-    const request = await axios.get(requests.postLogin);
+    const request = await axios.get("http://localhost:8000/set-cookie");
     console.log(request);
   };
-  */
+  fetchData();
   function vibrateCheck(checkElement,vibrateElement){
     if(checkElement.value===""){
         vibrateElement.classList.add("vibrate");
@@ -36,11 +36,13 @@ export default function SignIn() {
 
     try {
       // POST 요청은 body에 실어 보냄
-      await axios.post(requests.postLogin, {
+      const res = await axios.post(requests.postLogin, {
         id      : idElement.value,
         password: passWordElement.value,
       });
-
+      console.log("---------------------");
+      console.log(res);
+      console.log("---------------------");
       idElement.value="";
       passWordElement.value="";
 

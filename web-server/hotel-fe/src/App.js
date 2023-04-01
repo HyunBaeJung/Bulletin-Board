@@ -22,9 +22,7 @@ function App() {
   return (
     <div className="app">
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<MainPage />} />
-        </Route>
+        <Route path="/" element={<MainPage />}/>
         <Route path="/SignIn" element={<SignIn />} />
         <Route path="/Signup" element={<SignUp />} />
       </Routes>
