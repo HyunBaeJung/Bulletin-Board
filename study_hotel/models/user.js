@@ -21,7 +21,7 @@ class User extends Sequelize.Model {
         allowNull: false,
       },
       gender: {
-        type: Sequelize.ENUM('M', 'W'),
+        type: Sequelize.ENUM('M', 'F', 'N'),
         allowNull: false,
       },
       address: {
@@ -30,7 +30,7 @@ class User extends Sequelize.Model {
       },
       mobile_number: {
         type: Sequelize.STRING(20),
-        allowNull: false,
+        allowNull: true,
       },
       provider: {
         type: Sequelize.ENUM('local', 'kakao', 'naver', 'google'),
@@ -40,7 +40,7 @@ class User extends Sequelize.Model {
       snsId: {
         type: Sequelize.STRING(30),
         allowNull: true,
-      }
+      },
     }, {
       sequelize,
       timestamps: true,
