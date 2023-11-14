@@ -1,0 +1,46 @@
+<DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMG-to-PDF Converter</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/index.css' />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1><a>IMG to PDF</a></h1>
+      </header>
+    </main>
+    <article>
+      <p class='title'>PNG 또는 JPG 이미지를 PDF로 쉽게 변환하기</p>
+      <form method='post' action='/upload' enctype='multipart/form-data'>
+        <input id='file-upload' type='file' name='images' accept='.png, .jpg' multiple />
+        <p><label for='file-upload'>파일 선택</label></p>
+        <p id='selected-files'><code> </code> </p>
+        <p><input type='submit' value='Upload' /></p>
+      </form>
+    </article>
+    <footer>
+      <p><code>copyright &copy; IMG to PDF 2023</code></p>
+    </footer>
+    <script>
+      let fileUpload = document.getElementById('file-upload');
+      let selectedFiles = document.querySelector('#selected-files code');
+      let submitButton = document.querySelector('input[type=submit]');
+  
+      let filenames = '';
+      fileUpload.onchange = function() {
+        filenames = '';
+        for (let file of this.files) {
+          filenames += file.name;
+          filenames += ', ';
+        }
+        selectedFiles.parentElement.style.display = 'block';
+        selectedFiles.textContent = filenames;
+        submitButton.style.display = 'inline-block';
+      }
+    </script>
+  </body>
+</html>

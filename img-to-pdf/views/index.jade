@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    title IMG-to-PDF Converter
+    meta(charset='UTF-8')
+    link(rel='stylesheet' href='/stylesheets/style.css')
+    link(rel='stylesheet' href='/stylesheets/index-view.css')
+    script(type='module' src='/javascripts/sort.js' defer)
+
+  body
+    main
+      header
+        h1
+          a(href='/') IMG to PDF
+      article
+        p
+          a(href='/new') &larr; 돌아가기
+        div
+          each image in images
+            img(src=`/images/${image}` data-name=image width='200' height='200')
+        p
+          a(class='convert')
+            span(class='text') PDF로 변환하기 &rarr;
+            span(class='loader')
+        p
+          a(class='download' download) Download &darr;
+      footer
+        p
+          code copyright &copy; IMG to PDF 2023
