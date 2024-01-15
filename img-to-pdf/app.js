@@ -29,6 +29,7 @@ app.use(session({
   },
 }));
 
+// 라우터 설정
 app.use('/', pageRouter);
 app.use('/upload', uploadRouter);
 app.use('/pdf', pdfRouter);
