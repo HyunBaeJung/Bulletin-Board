@@ -1,22 +1,37 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const passport = require('passport');
 
 dotenv.config();
 
+// 라우터 require
 const authRouter = require('./routes/auth');
 
+const { sequelize } = require('./models');
+const passportConfig = require('./passport');
+
 const app = express();
+passportConfig();
 app.set('port', process.env.PORT || 8000);
 
+// Sequelize: MySQL 연동
+sequelize.sync({ force: false })
+	.then(() => {
+		console.log('데이터베이스 연결 성공');
+	})
+	.catch((err) => {
+		console.error(err);
+	});
+
 // CORS
-app.use(cors());
 app.use(cors({
-  origin: `${process.env.CLIENT_URL}`
+	origin: 'http://localhost:5173',
+	credentials: true,
 }));
 
 // 미들웨어 셋팅
@@ -34,6 +49,7 @@ app.use(session({
 		secure: false,
 	},
 }));
+app.use(passport.initialize());
 
 // 라우터 연결
 app.use('/auth', authRouter);
@@ -57,5 +73,5 @@ app.use((err, req, res, next) => {
 
 // 서버 실행
 app.listen(app.get('port'), () => {
-	console.log(app.get('port'), "번 포트에서 대기 중");
+	console.log(app.get('port'), '번 포트에서 대기 중');
 });
