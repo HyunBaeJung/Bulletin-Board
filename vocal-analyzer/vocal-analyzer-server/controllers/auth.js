@@ -13,7 +13,7 @@ exports.join = async (req, res, next) => {
     const exUser = await User.findOne({ where: { userId } });
     if (exUser) {
       return res.status(200).send({
-        code: 'JOIN FAIL',
+        code: 'JOIN_FAILED',
         message: '이미 가입된 회원입니다.',
       });
     }
@@ -29,8 +29,8 @@ exports.join = async (req, res, next) => {
       email,
     });
     return res.status(201).send({
-      code: 'JOIN SUCCESS',
-      message: '회원가입 성공! 로그인 해주세요.',
+      code: 'JOIN_SUCCEEDED',
+      message: '회원가입이 완료되었습니다. 로그인 해주세요.',
     });
   } catch (error) {
     console.error(error);
@@ -47,8 +47,8 @@ exports.login = (req, res, next) => {
       return next(authError);
     }
     if (!user) {
-      return res.status(401).send({
-        code: 'LOGIN FAIL',
+      return res.status(200).send({
+        code: 'LOGIN_FAILED',
         message: info.message,
       });
     }
@@ -79,14 +79,16 @@ exports.login = (req, res, next) => {
       // Redis에 리프레시 토큰 데이터 저장
       try {
         const client = await connectToRedis();
+        await client.select(1);
         await client.set(user.userId, refreshToken, 'EX', 5 * 24 * 3600);
-      } catch (error) {
+        await client.quit();
+      } catch (redisError) {
         console.error(redisError);
         return next(redisError);
       }
 
       return res.status(200).send({
-        code: 'LOGIN SUCCESS',
+        code: 'LOGIN_SUCCEEDED',
         accessToken,
         refreshToken,
       });
@@ -108,31 +110,34 @@ exports.logout = async (req, res, next) => {
       const userId = decoded.id;
 
       const client = await connectToRedis();
+      await client.select(1);
       const redisRefreshToken = await client.get(userId);
     
       if (redisRefreshToken && redisRefreshToken === refreshToken) {
         await client.del(userId);
       }
+
+      await client.quit();
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
         // 토큰 만료
         console.error(error);
         return res.status(200).send({
-          code: 'LOGOUT SUCCESS',
+          code: 'LOGOUT_SUCCEEDED',
         });
       } else {
         console.error(error);
-        next(error);
+        return next(error);
       }
     }
-  } else {
-    return res.status(200).send({
-      code: 'LOGOUT SUCCESS',
-    });
   }
+
+  return res.status(200).send({
+    code: 'LOGOUT_SUCCEEDED',
+  });
 };
 
-exports.renewAccessToken = async (res, req, next) => {  
+exports.reissueAccessToken = async (req, res, next) => {  
   const authHeader = req.headers?.authorization;
   const refreshToken = authHeader?.split(' ')[1];
 
@@ -146,6 +151,7 @@ exports.renewAccessToken = async (res, req, next) => {
 
       // Redis에서 리프레시 토큰 데이터 조회
       const client = await connectToRedis();
+      await client.select(1);
       const redisRefreshToken = await client.get(userId);
       if (redisRefreshToken && redisRefreshToken === refreshToken) {
         const userInfo = await User.findOne({ where: { userId } });
@@ -168,34 +174,40 @@ exports.renewAccessToken = async (res, req, next) => {
         });
 
         // Redis에 리프레시 토큰 정보 갱신
-        await client.set(userId, newRefreshToken);
+        await client.set(userId, newRefreshToken, 'EX', 5 * 24 * 3600);
+
+        await client.quit();
 
         return res.status(200).send({
-          code: 'TOKEN REISSUE SUCCESS',
+          code: 'TOKEN_REISSUE_SUCCEEDED',
           newAccessToken,
           newRefreshToken,
         });
       }
     } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        return res.status(401).send({
-          code: 'TOKEN REISSUE FAIL',
-          message: '리프레시 토큰이 유효하지 않습니다.',
+      if (error instanceof jwt.TokenExpiredError) {
+        return res.status(403).send({
+          code: 'REFRESH_TOKEN_EXPIRED',
         });
-      } else if (error instanceof jwt.TokenExpiredError) {
+      } else if (error instanceof jwt.JsonWebTokenError) {
         return res.status(401).send({
-          code: 'TOKEN REISSUE FAIL',
-          message: '리프레시 토큰이 만료되었습니다.',
+          code: 'INVALID_REFRESH_TOKEN',
         });
       } else {
         console.error(error);
-        next(error);
+        return next(error);
       }
     }
   } else {
-    return res.status(401).send({
-      code: 'TOKEN REISSUE FAIL',
-      message: '리프레시 토큰이 없습니다.',
+    return res.status(403).send({
+      code: 'NO_REFRESH_TOKEN',
     });
   }
+};
+
+// 로그인 상태 체크
+exports.loginStatus = async (req, res) => {
+  return res.status(200).send({
+    code: 'IS_LOGGED_IN',
+  });
 };

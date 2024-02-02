@@ -1,14 +1,13 @@
 const jwt = require('jsonwebtoken');
 
-const authHeader = req.headers?.authorization;
-const accessToken = authHeader?.split(' ')[1];
-
 // 로그인 상태 확인
-exports.isLoggedIn = (res, req, next) => {
+exports.isLoggedIn = (req, res, next) => {
+  const authHeader = req.headers?.authorization;
+  const accessToken = authHeader?.split(' ')[1];
+  // 액세스 토큰 없음
   if (!accessToken) {
-    return res.status(401).send({
-      code: 'IS NOT LOGGED IN',
-      message: '로그인이 필요합니다.',
+    return res.status(403).send({
+      code: 'NO_ACCESS_TOKEN',
     });
   }
 
@@ -18,23 +17,31 @@ exports.isLoggedIn = (res, req, next) => {
     });
     next();
   } catch (error) {
-    return res.status(401).send({
-      code: 'IS NOT LOGGED IN',
-      message: '로그인이 필요합니다.',
-    });
+    // 액세스 토큰 만료
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).send({
+        code: 'ACCESS_TOKEN_EXPIRED',
+      });
+    // 액세스 토큰 검증 실패(액세스 토큰 만료 제외)
+    } else {
+      return res.status(403).send({
+        code: 'INVALID_ACCESS_TOKEN',
+      });
+    }
   }
 };
 
 // 로그아웃 상태 확인
-exports.isNotLoggedIn = (res, req, next) => {
+exports.isNotLoggedIn = (req, res, next) => {
+  const authHeader = req.headers?.authorization;
+  const accessToken = authHeader?.split(' ')[1];
   if (accessToken) {
     try {
       jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, {
         algorithms: ['HS256']
       });
       return res.status(401).send({
-        code: 'IS LOGGED IN',
-        message: '이미 로그인 한 상태입니다.',
+        code: 'IS_LOGGED_IN',
       });
     } catch (error) {
       next();
