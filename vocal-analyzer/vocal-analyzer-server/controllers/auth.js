@@ -98,8 +98,7 @@ exports.login = (req, res, next) => {
 
 // 로그아웃
 exports.logout = async (req, res, next) => {
-  const authHeader = req.headers?.authorization;
-  const refreshToken = authHeader?.split(' ')[1];
+  const refreshToken = req.body?.refreshToken;
 
   if (refreshToken) {
     try {
@@ -137,9 +136,9 @@ exports.logout = async (req, res, next) => {
   });
 };
 
+// 액세스 토큰 재발급
 exports.reissueAccessToken = async (req, res, next) => {  
-  const authHeader = req.headers?.authorization;
-  const refreshToken = authHeader?.split(' ')[1];
+  const refreshToken = req.body?.refreshToken;
 
   if (refreshToken) {
     try {
