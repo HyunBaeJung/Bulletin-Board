@@ -19,6 +19,12 @@ const app = express();
 passportConfig();
 app.set('port', process.env.PORT || 8000);
 
+//모든 요청의 origin을 console에 출력
+app.use((req, res, next) => {
+	console.log(req.headers.origin);
+	next();
+});
+
 // Sequelize: MySQL 연동
 sequelize.sync({ force: false })
 	.then(() => {
@@ -63,12 +69,12 @@ app.use((req, res, next) => {
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message,
-      status: err.status || 500,
-    }
-  });
+	res.status(err.status || 500).json({
+		error: {
+			message: err.message,
+			status: err.status || 500,
+		}
+	});
 });
 
 // 서버 실행

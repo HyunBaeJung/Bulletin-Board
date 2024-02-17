@@ -111,7 +111,7 @@ exports.logout = async (req, res, next) => {
       const client = await connectToRedis();
       await client.select(1);
       const redisRefreshToken = await client.get(userId);
-    
+
       if (redisRefreshToken && redisRefreshToken === refreshToken) {
         await client.del(userId);
       }
@@ -137,7 +137,7 @@ exports.logout = async (req, res, next) => {
 };
 
 // 액세스 토큰 재발급
-exports.reissueAccessToken = async (req, res, next) => {  
+exports.reissueAccessToken = async (req, res, next) => {
   const refreshToken = req.body?.refreshToken;
 
   if (refreshToken) {
