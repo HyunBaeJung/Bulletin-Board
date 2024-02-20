@@ -62,6 +62,23 @@ app.use(passport.initialize());
 // 라우터 연결
 app.use('/auth', authRouter);
 
+// Swagger 설정
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Vocal Analyzer API',
+      version: '1.0.0',
+      description: 'Vocal Analyzer API with Swagger',
+    },
+  },
+  apis: ['./routes/*.js'],
+};
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 // 404 Not Found 에러 캐치
 app.use((req, res, next) => {
 	const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
