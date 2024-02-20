@@ -35,10 +35,12 @@ sequelize.sync({ force: false })
 	});
 
 // CORS
+/*
 app.use(cors({
 	origin: 'http://localhost:5173',
 	credentials: true,
 }));
+*/
 
 // 미들웨어 셋팅
 app.use(morgan('dev'));

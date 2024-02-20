@@ -3,31 +3,37 @@ const Sequelize = require('sequelize');
 class User extends Sequelize.Model {
   static initiate(sequelize) {
     User.init({
-      userId: {
-        type: Sequelize.STRING(45),
+      accountName: {
+        type: Sequelize.STRING(30),
         allowNull: false,
         unique: true,
+        comment: '아이디',
       },
       password: {
         type: Sequelize.STRING(60),
         allowNull: false,
+        comment: '비밀번호',
       },
       realName: {
         type: Sequelize.STRING(20),
         allowNull: false,
+        comment: '사용자 실명',
       },
       birthday: {
         type: Sequelize.DATEONLY,
         allowNull: false,
+        comment: '생년월일',
       },
       gender: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.ENUM('male', 'female'),
         allowNull: false,
+        comment: '성별',
       },
       email: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING(60),
         allowNull: false,
         unique: true,
+        comment: '본인인증을 위한 이메일',
       },
     }, {
       sequelize,
@@ -41,7 +47,9 @@ class User extends Sequelize.Model {
     });
   }
 
-  static associtate(db) {}
+  static associtate(db) {
+    db.User.hasMany(db.EmailVerification, { foreignKey: 'user_id' });
+  }
 };
 
 module.exports = User;

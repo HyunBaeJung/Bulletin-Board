@@ -1,16 +1,17 @@
 const passport = require('passport');
 const brcypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/user');
 const connectToRedis = require('../services/redisClient');
 
 // 회원가입
 exports.join = async (req, res, next) => {
-  const { userId, password, realName, birthday, gender, email } = req.body;
+  const { accountName, password, realName, birthday, gender, email } = req.body;
   try {
     // 이미 가입된 사용자 여부 확인
-    const exUser = await User.findOne({ where: { userId } });
+    const exUser = await User.findOne({ where: { accountName } });
     if (exUser) {
       return res.status(200).send({
         code: 'JOIN_FAILED',
@@ -21,7 +22,7 @@ exports.join = async (req, res, next) => {
     // 회원가입 정보 DB에 저장
     const hash = await brcypt.hash(password, 12);
     await User.create({
-      userId,
+      accountName,
       password: hash,
       realName,
       birthday,
@@ -59,29 +60,40 @@ exports.login = (req, res, next) => {
         return next(loginError);
       }
 
+      // 중복로그인 방지를 위한 로그인세션키 생성
+      const loginSessionKey = uuidv4();
+
       // 액세스 토큰 및 리프레시 토큰 생성
       const accessToken = jwt.sign({
-        id: user.userId,
+        id: user.accountName,
         username: user.realName,
+        loginSessionKey,
       }, process.env.JWT_ACCESS_SECRET, {
         expiresIn: '15m',
         issuer: 'vocal-analyzer',
         algorithm: 'HS256',
       });
       const refreshToken = jwt.sign({
-        id: user.userId,
+        id: user.accountName,
       }, process.env.JWT_REFRESH_SECRET, {
         expiresIn: '5d',
         issuer: 'vocal-analyzer',
         algorithm: 'HS256',
       });
 
-      // Redis에 리프레시 토큰 데이터 저장
+      // Redis에 액세스 토큰 로그인세션키와 리프레시 토큰 데이터 저장
       try {
         const client = await connectToRedis();
+
         await client.select(1);
-        await client.set(user.userId, refreshToken, 'EX', 5 * 24 * 3600);
+
+        // 로그인세션키 저장
+        await client.set(`loginSessionKey:${user.accountName}`, loginSessionKey, 'EX', 5 * 24 * 3600);
+        // 리프레시 토큰 저장
+        await client.set(`refreshToken:${user.accountName}`, refreshToken, 'EX', 5 * 24 * 3600);
+
         await client.quit();
+
       } catch (redisError) {
         console.error(redisError);
         return next(redisError);
@@ -89,6 +101,7 @@ exports.login = (req, res, next) => {
 
       return res.status(200).send({
         code: 'LOGIN_SUCCEEDED',
+        loginId: user.accountName,
         accessToken,
         refreshToken,
       });
@@ -98,36 +111,35 @@ exports.login = (req, res, next) => {
 
 // 로그아웃
 exports.logout = async (req, res, next) => {
-  const refreshToken = req.body?.refreshToken;
+  const accountName = req.body.accountName;
+  const refreshToken = req.headers['x-refresh-token'];
 
-  if (refreshToken) {
-    try {
+  try {
+    const client = await connectToRedis();
+
+    // Redis에서 로그인세션키 삭제
+    const redisLoginSessionKey = await client.get(`loginSessionKey:${accountName}`);
+    if (redisLoginSessionKey) await client.del(`loginSessionKey:${accountName}`);
+
+    // 리프레시 토큰이 있는 경우
+    if (refreshToken) {
+      jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, { algorithms: ['HS256'] });
+
+      const redisRefreshToken = await client.get(`refreshToken:${accountName}`);
+
       // 리프레시 토큰이 유효한 경우 Redis에서 리프레시 토큰 데이터 삭제
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, {
-        algorithms: ['HS256']
-      });
-      const userId = decoded.id;
-
-      const client = await connectToRedis();
-      await client.select(1);
-      const redisRefreshToken = await client.get(userId);
-
       if (redisRefreshToken && redisRefreshToken === refreshToken) {
-        await client.del(userId);
+        await client.del(`refreshToken:${accountName}`);
       }
+    }
 
-      await client.quit();
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        // 토큰 만료
-        console.error(error);
-        return res.status(200).send({
-          code: 'LOGOUT_SUCCEEDED',
-        });
-      } else {
-        console.error(error);
-        return next(error);
-      }
+    await client.quit();
+
+  } catch (error) {
+    console.error(error);
+    // 토큰 검증 실패를 제외한 에러
+    if (!(error instanceof jwt.JsonWebTokenError)) {
+      return next(error);
     }
   }
 
@@ -138,26 +150,29 @@ exports.logout = async (req, res, next) => {
 
 // 액세스 토큰 재발급
 exports.reissueAccessToken = async (req, res, next) => {
-  const refreshToken = req.body?.refreshToken;
+  const accountName = req.boody.accountName;
+  const refreshToken = req.headers['x-refresh-token'];
 
   if (refreshToken) {
     try {
       // 리프레시 토큰 검증
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, {
-        algorithms: ['HS256']
-      });
-      const userId = decoded.id;
+      jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, { algorithms: ['HS256'] });
 
       // Redis에서 리프레시 토큰 데이터 조회
       const client = await connectToRedis();
       await client.select(1);
-      const redisRefreshToken = await client.get(userId);
+
+      const redisRefreshToken = await client.get(`refreshToken:${accountName}`);
+
       if (redisRefreshToken && redisRefreshToken === refreshToken) {
-        const userInfo = await User.findOne({ where: { userId } });
+        const userInfo = await User.findOne({ where: { accountName } });
+        const newLoginSessionKey = uuidv4();
+
         // 새 액세스 토큰 재발급
         const newAccessToken = jwt.sign({
-          id: userId,
+          id: accountName,
           username: userInfo.realName,
+          loginSessionKey: newLoginSessionKey,
         }, process.env.JWT_ACCESS_SECRET, {
           expiresIn: '15m',
           issuer: 'happylibrary',
@@ -165,22 +180,23 @@ exports.reissueAccessToken = async (req, res, next) => {
         });
         // 새 리프레시 토큰 재발급
         const newRefreshToken = jwt.sign({
-          id: userId,
+          id: accountName,
         }, process.env.JWT_REFRESH_SECRET, {
           expiresIn: '5d',
           issuer: 'happylibrary',
           algorithm: 'HS256',
         });
 
-        // Redis에 리프레시 토큰 정보 갱신
-        await client.set(userId, newRefreshToken, 'EX', 5 * 24 * 3600);
+        // Redis에 리프레시 토큰과 로그인세션키 데이터 갱신
+        await client.set(`refreshToken:${accountName}`, newRefreshToken, 'EX', 5 * 24 * 3600);
+        await client.set(`loginSessionKey:${accountName}`, newLoginSessionKey, 'EX', 5 * 24 * 3600);
 
         await client.quit();
 
         return res.status(200).send({
           code: 'TOKEN_REISSUE_SUCCEEDED',
-          newAccessToken,
-          newRefreshToken,
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
         });
       }
     } catch (error) {
@@ -189,7 +205,7 @@ exports.reissueAccessToken = async (req, res, next) => {
           code: 'REFRESH_TOKEN_EXPIRED',
         });
       } else if (error instanceof jwt.JsonWebTokenError) {
-        return res.status(401).send({
+        return res.status(403).send({
           code: 'INVALID_REFRESH_TOKEN',
         });
       } else {
@@ -202,11 +218,4 @@ exports.reissueAccessToken = async (req, res, next) => {
       code: 'NO_REFRESH_TOKEN',
     });
   }
-};
-
-// 로그인 상태 체크
-exports.loginStatus = async (req, res) => {
-  return res.status(200).send({
-    code: 'IS_LOGGED_IN',
-  });
 };
