@@ -75,7 +75,7 @@ exports.isNotLoggedIn = (req, res, next) => {
       verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET) === 'VALID'
     )
   ) {
-    return res.status(401).send({
+    return res.status(403).send({
       code: 'IS_LOGGED_IN',
     });
   // 그 외 경우 모두 로그아웃 상태로 처리

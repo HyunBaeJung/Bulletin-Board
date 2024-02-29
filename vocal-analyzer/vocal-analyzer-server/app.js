@@ -4,8 +4,10 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const dotenv = require('dotenv');
-const cors = require('cors');
+// const cors = require('cors');
 const passport = require('passport');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 dotenv.config();
 
@@ -63,21 +65,8 @@ app.use(passport.initialize());
 app.use('/auth', authRouter);
 
 // Swagger 설정
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Vocal Analyzer API',
-      version: '1.0.0',
-      description: 'Vocal Analyzer API with Swagger',
-    },
-  },
-  apis: ['./routes/*.js'],
-};
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerDocument = YAML.load('./docs/swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 404 Not Found 에러 캐치
 app.use((req, res, next) => {
