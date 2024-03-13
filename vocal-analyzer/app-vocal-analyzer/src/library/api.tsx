@@ -5,8 +5,8 @@ const URL = "http://192.168.219.108:8000";
 
 const postLogin = async (id: string, passWord: string) => {
   await axios.post(URL + '/auth/login', {
-    "accountName": id,
-    "password": passWord
+    accountName: id,
+    password: passWord
   }).then((res) => {
     console.log(res.data);
     AsyncStorage.setItem('loginId', id);
@@ -20,6 +20,21 @@ const postLogin = async (id: string, passWord: string) => {
   })
 }
 
+const postLogout = async (id: string) => {
+  const token = await AsyncStorage.getItem('accessToken');
+  await axios.post(URL + '/auth/logout', {
+    accountName: id,
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }).then((res) => {
+    console.log(res.data);
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  })
+}
+
 const getUserInfo = async (id: string) => {
   const token = await AsyncStorage.getItem('accessToken');
   await axios.get(URL + '/auth/profile', {
@@ -27,7 +42,7 @@ const getUserInfo = async (id: string) => {
       Authorization: `Bearer ${token}`
     },
     params: {
-      "accountName": id,
+      accountName: id,
     }
   }).then((res) => {
     console.log(res.data);
@@ -39,4 +54,4 @@ const getUserInfo = async (id: string) => {
 }
 
 
-export { postLogin, getUserInfo };
+export { postLogin, getUserInfo, postLogout };
