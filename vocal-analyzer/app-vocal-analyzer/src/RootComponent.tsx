@@ -22,7 +22,7 @@ export default function RootComponent() {
   const [isLogin, setIsLogin] = useState(false);
 
   AsyncStorage.getItem('loginId').then((res) => {
-    console.log(res);
+    console.log("로그인 상태 체크 해봅니다?", res);
     if (res !== null) {
       setIsLogin(true);
     } else {
@@ -30,6 +30,10 @@ export default function RootComponent() {
     }
   })
 
+  /**
+   * TO-DO
+   * - 로그
+   */
   if (isLogin) {
     //로그인 O
     return (

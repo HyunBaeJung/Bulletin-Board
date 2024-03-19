@@ -315,7 +315,7 @@ exports.verifyEmailAuthCode = async () => {
       },
       order: [['createdAt', 'DESC']],
     });
-  
+
     // 유효한 모바일 인증 데이터가 존재하지 않는 경우(기한 만료)
     if (!emailAuthData) {
       return res.status(200).send({
@@ -373,9 +373,12 @@ exports.getAccountName = async (req, res, next) => {
  * Auth 9. 회원정보 불러오기
  */
 exports.loadProfile = async (req, res, next) => {
+  console.log("loadProfile", req.query);
   const { accountName } = req.query;
   try {
+    //const userInfo = await User.findOne({ where: { accountName } });
     const userInfo = await User.findOne({ where: { accountName } });
+    console.log("what!!!!!!!", userInfo);
     return res.status(200).send({
       code: 'LOAD PROFILE SUCCEEDED',
       userInfo,
@@ -395,11 +398,11 @@ exports.changePassword = async (req, res, next) => {
   try {
     // 비밀번호 변경의 경우, 현재 비밀번호 일치 여부 확인
     if (currentPassword) {
-      const { password } = await User.findOne({ 
+      const { password } = await User.findOne({
         where: { accountName },
-        attributes: ['password'], 
+        attributes: ['password'],
       });
-  
+
       const result = await bcrypt.compare(currentPassword, password);
       if (!result) {
         return res.status(200).send({
@@ -431,7 +434,7 @@ exports.changePassword = async (req, res, next) => {
  */
 exports.changeEmail = async (req, res, next) => {
   const { accountName, newEmail } = req.body;
-  
+
   try {
     await User.update({ email: newEmail }, {
       where: { accountName },

@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
-import { View, Image, Button, TextInput } from 'react-native'
+import { View, Button, TextInput } from 'react-native'
 import { postLogin } from '../library/api'
-
-// 화면이동 navigation.navigate('Main')
+import { userStore } from '../store/userStore';
 
 export default function Login({ navigation }: { navigation: any }) {
-  const img = require('../asset/logo/logo-full.png');
-  const [id, setId] = useState('')
-  const [password, setPassword] = useState('')
+
+  const { userId, setId, password, setPassword } = userStore();
 
   const login = async () => {
-    await postLogin(id, password).then((res) => {
-      console.log("??????????????????")
-      navigation.navigate('Start')
+    await postLogin(userId, password).then((res) => {
+      if (res?.status === 'OK') {
+        navigation.navigate('Start');
+      } else if (res?.status === 'FAIL') {
+        alert('아이디와 비밀번호를 확인해주세요');
+      }
     });
   }
 
@@ -21,6 +22,7 @@ export default function Login({ navigation }: { navigation: any }) {
       <TextInput placeholder="Enter your name" onChangeText={setId} />
       <TextInput placeholder="Enter your password" onChangeText={setPassword} />
       <Button title="Click me" onPress={() => { login(); }} />
+      <Button title='log' onPress={() => { console.log('MUD : ', userId, password) }} />
     </View>
   )
 }
