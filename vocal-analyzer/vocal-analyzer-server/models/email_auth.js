@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-class EmailAuth extends Sequelize.Model {i
+class EmailAuth extends Sequelize.Model {
   static initiate(sequelize) {
     EmailAuth.init({
       accountName: {

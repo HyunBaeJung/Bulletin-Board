@@ -15,12 +15,12 @@ class User extends Sequelize.Model {
         comment: '비밀번호',
       },
       realName: {
-        type: Sequelize.STRING(20),
+        type: Sequelize.STRING(30),
         allowNull: false,
         comment: '사용자 실명',
       },
       birthday: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.STRING(30),
         allowNull: false,
         comment: '생년월일',
       },
@@ -41,15 +41,13 @@ class User extends Sequelize.Model {
       underscored: true,
       modelName: 'User',
       tableName: 'users',
-      paranoid: true,
+      paranoid: false,
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });
   }
 
-  static associtate(db) {
-    db.User.hasMany(db.EmailVerification, { foreignKey: 'user_id' });
-  }
+  static associtate(db) {}
 };
 
 module.exports = User;

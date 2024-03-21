@@ -1,11 +1,11 @@
-const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const dotenv = require('dotenv');
 // const cors = require('cors');
+const dotenv = require('dotenv');
+const express = require('express');
+const session = require('express-session');
+const morgan = require('morgan');
 const passport = require('passport');
+const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 
@@ -20,12 +20,6 @@ const passportConfig = require('./passport');
 const app = express();
 passportConfig();
 app.set('port', process.env.PORT || 8000);
-
-//모든 요청의 origin을 console에 출력
-app.use((req, res, next) => {
-	console.log(req.headers.origin);
-	next();
-});
 
 // Sequelize: MySQL 연동
 sequelize.sync({ force: false })

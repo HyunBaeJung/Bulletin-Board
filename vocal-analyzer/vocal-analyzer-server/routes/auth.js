@@ -1,10 +1,10 @@
 const express = require('express');
 
-const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const { join, withdrawal } = require('../controllers/auth');
 const { login, logout, reissueAccessToken } = require('../controllers/auth');
 const { sendEmailAuthCode, verifyEmailAuthCode, getAccountName } = require('../controllers/auth');
 const { loadProfile, changePassword, changeEmail } = require('../controllers/auth');
+const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router.post('/refresh-token', reissueAccessToken);
 // POST /auth/email-auth/code
 router.post('/email-auth/code', sendEmailAuthCode);
 
-// POST /auth/email-auth/verify
+// POST /auth/email-auth/verification
 router.post('/email-auth/verfication', verifyEmailAuthCode);
 
 // GET /auth/recovery/account-name

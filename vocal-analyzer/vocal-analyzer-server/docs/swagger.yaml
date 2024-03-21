@@ -35,9 +35,8 @@ paths:
                   example: "홍길동"
                 birthday:
                   type: string
-                  format: date
-                  description: 생년월일(YYYY-MM-DD)
-                  example: "1990-01-01"
+                  description: 생년월일 8자리(YYYYMMDD)
+                  example: "19990101"
                 gender:
                   type: string
                   description: 성별
@@ -48,7 +47,34 @@ paths:
                   format: email
                   description: 사용자 이메일
                   example: "useremail@example.com"
+              required:
+                - accountName
+                - password
+                - realName
+                - birthday
+                - gender
+                - email
       responses:
+        '200':
+          description: 회원가입 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: 회원가입 결과를 알리는 코드
+                  message:
+                    type: string
+                    description: 회원가입 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 회원가입 실패 - 이미 가입된 계정
+                  value: {
+                    "code": "JOIN_FAILED",
+                    "message": "이미 가입된 회원입니다.",
+                  }
         '201':
           description: 회원가입 성공
           content:
@@ -58,27 +84,17 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 회원가입 성공을 알리는 코드
-                    example: "JOIN_SUCCEEDED"
+                    description: 회원가입 결과를 알리는 코드
                   message:
                     type: string
-                    description: 회원가입 성공을 알리는 메시지
-                    example: "회원가입이 완료되었습니다. 로그인 해주세요."
-        '200':
-          description: 회원가입 실패(이미 가입된 계정)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    description: 회원가입 실패를 알리는 코드
-                    example: "JOIN_FAILED"
-                  message:
-                    type: string
-                    description: 회원가입 실패를 알리는 메시지
-                    example: "이미 가입된 회원입니다."
+                    description: 회원가입 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 회원가입 성공
+                  value: {
+                    "code": "JOIN_SUCCEEDED",
+                    "message": "회원가입이 완료되었습니다. 로그인 해주세요.",
+                  }
         '403':
           description: 이미 로그인 된 상태에서 회원가입을 진행한 경우
           content:
@@ -88,8 +104,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 이미 로그인 된 상태 때문에 회원가입에 실패했다는 것을 알리는 코드
-                    example: "IS_LOGGED_IN"
+                    description: 로그인 및 로그아웃 상태 여부를 알리는 코드
+              examples:
+                example1:
+                  summary: 이미 로그인 된 상태
+                  value: {
+                    "code": "IS_LOGGED_IN",
+                  }
         '500':
           description: 서버 에러
 
@@ -125,8 +146,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 회원탈퇴 성공을 알리는 코드
-                    example: "WITHDRAWAL SUCCEEDED"
+                    description: 회원탈퇴 결과를 알리는 코드
+              examples: 
+                example1:
+                  summary: 회원탈퇴 성공
+                  value: {
+                    "code": "WITHDRAWAL SUCCEEDED",
+                  } 
         '401':
           description: 액세스 토큰이 만료된 상태
           content:
@@ -136,8 +162,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰 만료를 알리는 코드
-                    example: "ACCESS_TOKEN_EXPIRED"      
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples: 
+                example1:
+                  summary: 액세스 토큰 만료
+                  value: {
+                    "code": "ACCESS_TOKEN_EXPIRED",
+                  }     
         '403':
           description: 액세스 토큰이 만료된 경우를 제외하고, 액세스 토큰이 없거나 유효하지 않거나 중복로그인이 발생한 경우
           content:
@@ -147,8 +178,23 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰이 유효하지 않음 등의 결과를 알리는 코드
-                    example: "NO_ACCESS_TOKEN 또는 INVALID_ACCESS_TOKEN 또는 INVALID_LOGIN_SESSION_KEY"
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 액세스 토큰이 없음
+                  value: {
+                    "code": "NO_ACCESS_TOKEN",
+                  }
+                example2:
+                  summary: 중복로그인 발생
+                  value: {
+                    "code": "INVALID_LOGIN_SESSION_KEY",
+                  }
+                example3:
+                  summary: 액세스 토큰이 유효하지 않음
+                  value: {
+                    "code": "INVALID_ACCESS_TOKEN",
+                  }
         '500':
           description: 서버 에러
 
@@ -174,9 +220,12 @@ paths:
                   description: 비밀번호
                   format: password
                   example: "123456"
+              required:
+                - accountName
+                - password
       responses:
         '200':
-          description: 로그인 성공 또는 실패(비밀번호 불일치, 이미 가입된 계정)
+          description: 로그인 성공 또는 실패
           content:
             application/json:
               schema:
@@ -184,20 +233,42 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 로그인 결과(성공, 실패)를 알리는 코드
-                    example: "LOGIN_SUCCEEDED 또는 LOGIN_FAILED"
+                    description: 로그인 결과를 알리는 코드
                   message:
                     type: string
-                    description: 로그인 실패한 경우에 한해 전송하는, 로그인 실패 원인을 알리는 메시지
-                    example: "비밀번호가 일치하지 않습니다. 또는 가입되지 않은 계정입니다."
+                    description: 로그인에 실패한 경우에 한해 전송하는, 로그인 실패 원인을 알리는 메시지
+                  loginId:
+                    type: string
+                    description: 로그인에 성공한 경우에 한해 전송하는, 클라이언트 세션스토리지에 저장할 사용자 아이디
                   accessToken:
                     type: string
-                    description: 로그인 성공한 경우에 한해 전송하는, 액세스 토큰
+                    description: 로그인에 성공한 경우에 한해 전송하는, 액세스 토큰
                   refreshToken:
                     type: string
-                    description: 로그인 성공한 경우에 한해 전송하는, 리프레시 토큰
+                    description: 로그인에 성공한 경우에 한해 전송하는, 리프레시 토큰
+              example:
+                example1:
+                  summary: 로그인 성공
+                  value: {
+                    "code": "LOGIN_SUCCEEDED",
+                    "loginId": user123,
+                    "accessToken": "accessToken 문자열",
+                    "refreshToken": "refreshToken 문자열",
+                  }
+                example2:
+                  summary: 로그인 실패 - 가입되지 않은 계정
+                  value: {
+                    "code": "LOGIN_FAILED",
+                    "message": "가입되지 않은 계정입니다.",
+                  }
+                example3:
+                  summary: 로그인 실패 - 비밀번호 불일치
+                  value: {
+                    "code": "LOGIN_FAILED",
+                    "message": "비밀번호가 일치하지 않습니다.",
+                  }
         '403':
-          description: 이미 로그인 된 상태에서 로그인을 진행한 경우
+          description: 이미 로그인 된 상태에서 회원가입을 진행한 경우
           content:
             application/json:
               schema:
@@ -205,8 +276,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 이미 로그인 된 상태 때문에 로그인에 실패했다는 것을 알리는 코드
-                    example: "IS_LOGGED_IN"
+                    description: 로그인 및 로그아웃 상태 여부를 알리는 코드
+              examples:
+                example1:
+                  summary: 이미 로그인 된 상태
+                  value: {
+                    "code": "IS_LOGGED_IN",
+                  }
         '500':
           description: 서버 에러
 
@@ -244,8 +320,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 로그아웃 성공을 알리는 코드
-                    example: "LOGOUT_SUCCEEDED"
+                    description: 로그아웃 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 로그아웃 성공
+                  value: {
+                    "code": "LOGOUT_SUCCEEDED",
+                  }
         '500':
           description: 서버 에러
 
@@ -273,6 +354,8 @@ paths:
                   type: string
                   description: 사용자 아이디
                   example: "user123"
+              required:
+                - accountName
       responses:
         '200':
           description: 토큰 재발급 성공
@@ -283,14 +366,21 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 토큰 재발급 성공을 알리는 코드
-                    example: "TOKEN_REISSUE_SUCCEEDED"
+                    description: 토큰 재발급 결과를 알리는 코드
                   accessToken:
                     type: string
-                    description: 재발급된 액세스 토큰
+                    description: 토큰 재발급에 성공한 경우에 한해 전송하는, 재발급된 액세스 토큰
                   refreshToken:
                     type: string
-                    description: 재발급된 리프레시 토큰
+                    description: 토큰 재발급에 성공한 경우에 한해 전송하는, 재발급된 리프레시 토큰
+              examples:
+                example1:
+                  summary:
+                  value: {
+                    "code": "TOKEN_REISSUE_SUCCEEDED",
+                    "accessToken": "accessToken 문자열",
+                    "refreshToken": "refreshToken 문자열",
+                  }
         '403':
           description: 토큰 재발급 실패
           content:
@@ -300,8 +390,33 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 토큰 재발급 실패 원인을 알리는 코드로, 리프레시 토큰이 유효하지 않거나 만료되었거나 없는 경우
-                    example: "INVALID_REFRESH_TOKEN 또는 REFRESH_TOKEN_EXPIRED 또는 NO_REFRESH_TOKEN"            
+                    description: 토큰 재발급 결과를 알리는 코드
+              example:
+                example1:
+                  summary: Redis에 해당 사용자의 리프레시 토큰 데이터가 존재하지 않음
+                  value: {
+                    "code": "REFRESH_TOKEN_NOT_FOUND",
+                  }
+                example2:
+                  summary: Redis에 저장된 사용자의 리프레시 토큰 데이터와 요청 객체의 리프레시 토큰이 일치하지 않음
+                  value: {
+                    "code": "REFRESH_TOKEN_MISMATCH",
+                  }
+                example3:
+                  summary: 리프레시 토큰이 만료됨
+                  value: {
+                    "code": "REFRESH_TOKEN_EXPIRED",
+                  }
+                example4:
+                  summary: 리프레시 토큰이 유효하지 않음
+                  value: {
+                    "code": "INVALID_REFRESH_TOKEN",
+                  }
+                example5:
+                  summary: 리프레시 토큰 없음
+                  value: {
+                    "code": "NO_REFRESH_TOKEN",
+                  }
         '500':
           description: 서버 에러
 
@@ -309,8 +424,8 @@ paths:
     post:
       tags:
         - Auth
-      summary: 이메일 본인인증 보안코드 전송
-      description: 사용자 이메일로 본인인증을 위한 보안코드 전송
+      summary: 이메일 본인인증 인증코드 전송
+      description: 사용자 이메일로 본인인증을 위한 인증코드 전송
       requestBody:
         required: true
         content:
@@ -327,6 +442,12 @@ paths:
                   format: email
                   description: 사용자 이메일
                   example: "useremail@example.com"
+                isRegisteredEmailRequired:
+                  type: boolean
+                  description: 이메일이 이미 가입되어 있어야 하는 경우(회원탈퇴 등)와 아닌 경우(회원가입 등)를 구분
+              required:
+                - email
+                - isRegisteredEmailRequired
       responses:
         '201':
           description: 본인인증 메일 전송 성공
@@ -337,8 +458,39 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 본인인증 메일 전송 성공을 알리는 코드
-                    example: "AUTH_CODE_SENT"          
+                    description: 본인인증 메일 전송 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 인증코드 전송 성공
+                  value: { 
+                    "code": "AUTH_CODE_SENT",
+                  }
+        '200':
+          description: 본인인증 메일 전송 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: 본인인증 메일 전송 결과를 알리는 코드
+                  message:
+                    type: string
+                    description: 본인인증 메일 전송 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 인증코드 전송 실패 - 이미 가입된 이메일(회원가입, 이메일 변경)
+                  value: { 
+                    "code": "AUTH_CODE_SEND_FAILED",
+                    "message": "이미 해당 이메일로 가입된 정보가 존재합니다.",
+                  }
+                example2:
+                  summary: 인증코드 전송 실패 - 일치하는 가입정보 없음(회원탈퇴, 아이디 및 비밀번호 찾기)
+                  value: { 
+                    "code": "AUTH_CODE_SEND_FAILED",
+                    "message": "입력한 정보와 일치하는 회원정보가 없습니다.",
+                  }
         '500':
           description: 서버 에러
 
@@ -346,8 +498,8 @@ paths:
     post:
       tags:
         - Auth
-      summary: 이메일 본인인증 보안코드 전송
-      description: 사용자 이메일로 본인인증을 위한 보안코드 전송
+      summary: 이메일 본인인증 인증코드 전송
+      description: 사용자 이메일로 본인인증을 위한 인증코드 전송
       requestBody:
         required: true
         content:
@@ -362,11 +514,14 @@ paths:
                   example: "useremail@example.com"
                 emailAuthCode:
                   type: string
-                  description: 본인인증 보안코드 6자리 숫자 문자열
+                  description: 본인인증 인증코드 6자리 숫자 문자열
                   example: "012345"
+              required:
+                - email
+                - emailAuthCode
       responses:
         '200':
-          description: 본인인증 보안코드 검증 성공 또는 실패
+          description: 본인인증 인증코드 검증 성공 또는 실패
           content:
             application/json:
               schema:
@@ -374,12 +529,28 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 보안코드 검증 성공 또는 실패를 알리는 코드
-                    example: "AUTH_CODE_VERIFICATION_SUCCEEDED 또는 AUTH_CODE_VERIFICATION_FAILED"
+                    description: 인증코드 검증 결과를 알리는 코드
                   message:
                     type: string
-                    description: 보안코드 검증에 실패한 경우에 한해 전송하는, 실패 원인을 알리는 메시지
-                    example: "인증번호의 유효시간이 만료되었습니다. 다시 시도해 주세요. 또는 인증번호가 일치하지 않습니다."
+                    description: 인증코드 검증에 실패한 경우에 한해 전송하는, 인증코드 검증 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 인증코드 검증 성공
+                  value: { 
+                    "code": "AUTH_CODE_VERIFICATION_SUCCEEDED",
+                  }
+                example2:
+                  summary: 인증코드 검증 실패 - 유효시간 만료
+                  value: { 
+                    "code": "AUTH_CODE_VERIFICATION_FAILED", 
+                    "message": "인증코드의 유효시간이 만료되었습니다. 다시 시도해 주세요.",
+                  }
+                example3:
+                  summary: 인증코드 검증 실패 - 인증코드 불일치
+                  value: { 
+                    "code": "AUTH_CODE_VERIFICATION_FAILED", 
+                    "message": "인증코드가 일치하지 않습니다.",
+                  }
         '500':
           description: 서버 에러
 
@@ -399,7 +570,7 @@ paths:
           required: true
       responses:
         '200':
-          description: 아이디 조회 성공 또는 실패
+          description: 아이디 찾기 성공 또는 실패
           content:
             application/json:
               schema:
@@ -407,12 +578,26 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 아이디 찾기(조회) 성공 또는 실패를 알리는 코드
-                    example: "FIND_ID_SUCCEEDED 또는 FIND_ID_FAILED"
+                    description: 아이디 찾기 결과를 알리는 코드
+                  accountName:
+                    type: string
+                    description: 아이디 찾기에 성공한 경우에 한해 전송하는, 사용자 아이디
                   message:
                     type: string
-                    description: 아이디 찾기(조회)에 실패한 경우에 한해 전송하는, 실패 원인을 알리는 메시지
-                    example: "해당 이메일 주소로 가입된 계정이 없습니다."
+                    description: 아이디 찾기에 실패한 경우에 한해 전송하는, 아이디 찾기 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 아이디 찾기 성공
+                  value: {
+                    "code": "FIND_ID_SUCCEEDED",
+                    "accountName": "user123",
+                  }
+                example2:
+                  summary: 아이디 찾기 실패
+                  value: {
+                    "code": "FIND_ID_FAILED",
+                    "message": "해당 이메일 주소로 가입된 계정이 없습니다.",
+                  }
         '500':
           description: 서버 에러
 
@@ -433,16 +618,14 @@ paths:
                   type: string
                   description: 사용자 아이디
                   example: "user123"
-                currentPassword:
-                  type: string
-                  format: password
-                  description: 기존 비밀번호
-                  example: "123456"
                 newPassword:
                   type: string
                   format: password
                   description: 새 비밀번호
                   example: "123456"
+              required:
+                - accountName
+                - newPassword
       responses:
         '200':
           description: 비밀번호 찾기(변경) 성공 또는 실패
@@ -453,12 +636,17 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 비밀번호 찾기(변경) 성공 또는 실패를 알리는 코드
-                    example: "CHANGE_PASSWORD_SUCCEEDED 또는 CHANGE_PASSWORD_FAILED"
+                    description: 비밀번호 찾기 결과를 알리는 코드
                   message:
                     type: string
-                    description: 비밀번호 찾기(변경) 성공 또는 실패를 알리는 메시지
-                    example: "비밀번호가 변경되었습니다. 다시 로그인 해주세요. 또는 비밀번호가 일치하지 않습니다."
+                    description: 비밀번호 찾기 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 비밀번호 찾기 성공
+                  value: {
+                    "code": "CHANGE_PASSWORD_SUCCEEDED",
+                    "message": "비밀번호가 변경되었습니다. 다시 로그인 해주세요.",
+                  }
         '500':
           description: 서버 에러
 
@@ -494,8 +682,34 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 회원정보 로드 성공을 알리는 코드
-                    example: "LOAD PROFILE SUCCEEDED"
+                    description: 회원정보 불러오기 결과를 알리는 코드
+                  userInfo:
+                    type: object
+                    description: 회원정보 객체
+                    properties:
+                      accountName:
+                        type: string
+                      realName:
+                        type: string
+                      birthday:
+                        type: string
+                      gender:
+                        type: string
+                      email:
+                        type: string
+              examples:
+                example1:
+                  summary: 회원정보 불러오기 성공
+                  value: {
+                    "code": "LOAD PROFILE SUCCEEDED",
+                    "userInfo": {
+                      "accountName": "user123",
+                      "realName": "홍길동",
+                      "birthday": "19990101",
+                      "gender": "male",
+                      "email": "useremail@example.com",
+                    }
+                  }
         '401':
           description: 액세스 토큰이 만료된 상태
           content:
@@ -505,8 +719,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰 만료를 알리는 코드
-                    example: "ACCESS_TOKEN_EXPIRED"      
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples: 
+                example1:
+                  summary: 액세스 토큰 만료
+                  value: {
+                    "code": "ACCESS_TOKEN_EXPIRED",
+                  }     
         '403':
           description: 액세스 토큰이 만료된 경우를 제외하고, 액세스 토큰이 없거나 유효하지 않거나 중복로그인이 발생한 경우
           content:
@@ -516,8 +735,23 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰이 유효하지 않음 등의 결과를 알리는 코드
-                    example: "NO_ACCESS_TOKEN 또는 INVALID_ACCESS_TOKEN 또는 INVALID_LOGIN_SESSION_KEY"
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 액세스 토큰이 없음
+                  value: {
+                    "code": "NO_ACCESS_TOKEN",
+                  }
+                example2:
+                  summary: 중복로그인 발생
+                  value: {
+                    "code": "INVALID_LOGIN_SESSION_KEY",
+                  }
+                example3:
+                  summary: 액세스 토큰이 유효하지 않음
+                  value: {
+                    "code": "INVALID_ACCESS_TOKEN",
+                  }
         '500':
           description: 서버 에러
 
@@ -557,9 +791,13 @@ paths:
                   format: password
                   description: 새 비밀번호
                   example: "123456"
+              required:
+                - accountName
+                - currentPassword
+                - newPassword
       responses:
         '200':
-          description: 비밀번호 변경 성공 또는 실패
+          description: 비밀번호 찾기(변경) 성공 또는 실패
           content:
             application/json:
               schema:
@@ -567,12 +805,23 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 비밀번호 변경 성공 또는 실패를 알리는 코드
-                    example: "CHANGE_PASSWORD_SUCCEEDED 또는 CHANGE_PASSWORD_FAILED"
+                    description: 비밀번호 찾기 결과를 알리는 코드
                   message:
                     type: string
-                    description: 비밀번호 변경 성공 또는 실패를 알리는 메시지
-                    example: "비밀번호가 변경되었습니다. 다시 로그인 해주세요. 또는 비밀번호가 일치하지 않습니다."
+                    description: 비밀번호 찾기 결과에 대한 원인을 알리는 메시지
+              examples:
+                example1:
+                  summary: 비밀번호 찾기 성공
+                  value: {
+                    "code": "CHANGE_PASSWORD_SUCCEEDED",
+                    "message": "비밀번호가 변경되었습니다. 다시 로그인 해주세요.",
+                  }
+                example2:
+                  summary: 비밀번호 찾기 실패
+                  value: {
+                    "code": "CHANGE_PASSWORD_FAILED",
+                    "message": "비밀번호가 일치하지 않습니다.",
+                  }
         '401':
           description: 액세스 토큰이 만료된 상태
           content:
@@ -582,8 +831,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰 만료를 알리는 코드
-                    example: "ACCESS_TOKEN_EXPIRED"      
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples: 
+                example1:
+                  summary: 액세스 토큰 만료
+                  value: {
+                    "code": "ACCESS_TOKEN_EXPIRED",
+                  }     
         '403':
           description: 액세스 토큰이 만료된 경우를 제외하고, 액세스 토큰이 없거나 유효하지 않거나 중복로그인이 발생한 경우
           content:
@@ -593,8 +847,23 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰이 유효하지 않음 등의 결과를 알리는 코드
-                    example: "NO_ACCESS_TOKEN 또는 INVALID_ACCESS_TOKEN 또는 INVALID_LOGIN_SESSION_KEY"
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 액세스 토큰이 없음
+                  value: {
+                    "code": "NO_ACCESS_TOKEN",
+                  }
+                example2:
+                  summary: 중복로그인 발생
+                  value: {
+                    "code": "INVALID_LOGIN_SESSION_KEY",
+                  }
+                example3:
+                  summary: 액세스 토큰이 유효하지 않음
+                  value: {
+                    "code": "INVALID_ACCESS_TOKEN",
+                  }
         '500':
           description: 서버 에러
 
@@ -639,8 +908,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 이메일 변경 성공을 알리는 코드
-                    example: "EMAIL_UPDATED"
+                    description: 이메일 변경 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 이메일 변경 성공
+                  value: {
+                    "code": "EMAIL_UPDATED",
+                  }
         '401':
           description: 액세스 토큰이 만료된 상태
           content:
@@ -650,8 +924,13 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰 만료를 알리는 코드
-                    example: "ACCESS_TOKEN_EXPIRED"      
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples: 
+                example1:
+                  summary: 액세스 토큰 만료
+                  value: {
+                    "code": "ACCESS_TOKEN_EXPIRED",
+                  }     
         '403':
           description: 액세스 토큰이 만료된 경우를 제외하고, 액세스 토큰이 없거나 유효하지 않거나 중복로그인이 발생한 경우
           content:
@@ -661,8 +940,23 @@ paths:
                 properties:
                   code:
                     type: string
-                    description: 액세스 토큰이 유효하지 않음 등의 결과를 알리는 코드
-                    example: "NO_ACCESS_TOKEN 또는 INVALID_ACCESS_TOKEN 또는 INVALID_LOGIN_SESSION_KEY"
+                    description: 액세스 토큰 검증 결과를 알리는 코드
+              examples:
+                example1:
+                  summary: 액세스 토큰이 없음
+                  value: {
+                    "code": "NO_ACCESS_TOKEN",
+                  }
+                example2:
+                  summary: 중복로그인 발생
+                  value: {
+                    "code": "INVALID_LOGIN_SESSION_KEY",
+                  }
+                example3:
+                  summary: 액세스 토큰이 유효하지 않음
+                  value: {
+                    "code": "INVALID_ACCESS_TOKEN",
+                  }
         '500':
           description: 서버 에러
 
